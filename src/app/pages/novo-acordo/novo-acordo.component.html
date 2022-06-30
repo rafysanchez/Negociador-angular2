@@ -1,0 +1,44 @@
+<div *ngIf="loading" class="overlay">
+    <ngx-spinner><div class="mensagem-spinner" style="font-weight: bold; margin-top: 40px; padding: 3px; color: black; background-color: gray;">{{mensagemSpinner}}</div></ngx-spinner>
+</div>
+
+<div class="containerLogged pt-2" *ngIf="!loading">
+    <div *ngIf="!administradoraSelecionada" class="d-flex col justify-content-center row">
+        <p class="text-center">Selecione a administradora que deseja consultar.</p>
+        <button type="button" class="btn btn-primary" (click)="alterarAdministradora()">Administradoras</button>
+    </div>
+
+    <div class="text-center" *ngIf="administradoraSelecionada">
+        <div class="card">
+            <header>
+                <div class="card-body">
+                    <div *ngIf="erro != ''" class="erro pb-4">{{erro}}</div>
+                    <div *ngIf="listaConsorcios.length == 0">Você não tem débitos pendentes no momento<br><b>{{dataHoraAtual | date:'dd/MM/yyyy HH:mm:ss'}}</b></div>
+                    <div *ngIf="listaConsorcios.length > 0">
+                        <p *ngIf="listaConsorcios.length > 1">Identificamos que você possui mais de uma cota.<br>Escolha o Grupo e Cota abaixo para visualizar as possibilidade de acordo disponíveis em cada uma</p>
+                        <my-tabs>
+                            <my-tab *ngFor="let acordo of listaConsorcios" [tabTitle]="(listaConsorcios.length == 1 ? 'Grupo/Cota: ' : '') + acordo.grupoID + '/' + acordo.cota">                               
+                                <div *ngIf="!acordo.permiteNegociacaoOnline || acordo.bloqueadaNegociacaoOnline">
+                                    Para esta cota a negociação está disponível por meio do
+                                    <span *ngFor="let contato of listaContatos" class="fw-normal flex-nowrap">
+                                        <span *ngIf="contato.tipo!='WhatsApp'" class="fw-normal flex-nowrap"><b>{{contato.valor}}</b>, </span>
+                                        <span *ngIf="contato.tipo=='WhatsApp'" class="fw-normal flex-nowrap">ou se preferir clique nesse <a href='https://api.whatsapp.com/send?phone={{contato.valor}}&text=Ol%C3%A1!%20Quero%20informa%C3%A7%C3%B5es%20sobre%20meu%20Cons%C3%B3rcio.' target="_blank">link</a> e fale por meio do WhatsApp</span>
+                                    </span>
+                                    <div class="pt-3"><b>Atualizado em {{dataHoraAtual | date:"dd/MM/yyyy HH:mm:ss"}}</b></div>
+                                </div>
+                                <div *ngIf="acordo.permiteNegociacaoOnline && !acordo.bloqueadaNegociacaoOnline && acordo.consorcioAcordoID > 0">
+                                    Esta cota já possui um acordo realizado, se desejar alterar o acordo vigente entre em contato conosco por meio do
+                                    <span *ngFor="let contato of listaContatos" class="fw-normal flex-nowrap">
+                                        <span *ngIf="contato.tipo!='WhatsApp'" class="fw-normal flex-nowrap"><b>{{contato.valor}}</b>, </span>
+                                        <span *ngIf="contato.tipo=='WhatsApp'" class="fw-normal flex-nowrap">ou se preferir clique nesse <a href='https://api.whatsapp.com/send?phone={{contato.valor}}&text=Ol%C3%A1!%20Quero%20informa%C3%A7%C3%B5es%20sobre%20meu%20Cons%C3%B3rcio.' target="_blank">link</a> e fale por meio do WhatsApp</span>
+                                    </span>
+                                    <div class="pt-3"><b>Atualizado em {{dataHoraAtual | date:"dd/MM/yyyy HH:mm:ss"}}</b></div>
+                                </div>
+                                <app-propostas *ngIf="acordo.consorcioAcordoID == 0 && acordo.permiteNegociacaoOnline && !acordo.bloqueadaNegociacaoOnline && acordo.propostasAcordo != undefined && acordo.propostasAcordo.length > 0" [consorcioId]="acordo.consorcioID" [lista]="acordo.propostasAcordo"></app-propostas></my-tab>
+                        </my-tabs>
+                    </div>  
+                </div>
+            </header>
+        </div>
+    </div>
+</div>

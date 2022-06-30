@@ -1,0 +1,37 @@
+<div id="todosDebitos">
+    <table align="center" class="table table-striped" style="border: 1px solid #bbb; margin-bottom: 15px;">
+        <thead>
+            <tr>
+                <th class="text-center align-middle">Tipo de Débito</th>
+                <th class="text-center align-middle">Nº Débito</th>
+                <th class="text-center align-middle">Data de Vencimento</th>
+                <th class="text-center">Valor <br>Atualizado Até {{atualizadoAte | date:'dd/MM/yyyy'}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let d of lista">
+                <td data-label = "Tipo" class="text-center">{{d.tipo}}</td>
+                <td data-label = "Débito" class="text-center">{{d.numeroDoDebito}}</td>
+                <td data-label = "Vencimento" class="text-center">{{d.vencimento | date:'dd/MM/yyyy'}}</td>
+                <td data-label = "Valor" class="text-center">{{d.valor | currency}}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+           
+            <td style="width: fit-content;" class="text-center">
+              Total da Dívida:   <strong>{{valorTotal | currency}}</strong>
+            </td>
+        </tfoot>
+
+    </table>
+
+    <div class="detalhamento-planilha">
+        <p><span style="color: red; font-size: 15px;">*</span>Os débitos acima já compreendem todos os encargos.</p>
+    </div>
+    <div class="detalhamento-planilha">
+        <p *ngIf="possuiPCL" class="item-detalhamento"><strong>PCL</strong> - Parcela do Consórcio atualizada</p>
+        <p *ngIf="possuiDFP" class="item-detalhamento"> <strong>DFP</strong> - Diferença de Parcela</p>
+        <p *ngIf="possuiDPJ" class="item-detalhamento"> <strong>DPJ</strong> - Despesa Jurídica</p>
+        <p *ngIf="possuiDPC" class="item-detalhamento"> <strong>DPC</strong> - Despesa de Cobrança (Notificação)</p>
+    </div>
+</div>

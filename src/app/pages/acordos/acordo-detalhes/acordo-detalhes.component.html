@@ -1,0 +1,31 @@
+<div>
+    <div class="row" style="display: flex; padding: 5px 10px 10px 0px">
+        <div class="col text-left"><b>Detalhe do Acordo</b></div>
+        <div class="col text-left text-nowrap" *ngIf="mostrardataacordo"><b>Realizado em: {{acordo.dataHoraDoAcordo | date:"dd/MM/yyyy HH:mm:ss"}}</b></div>
+        <div class="col text-center"><strong>Valor Total:</strong> {{acordo.valorAcordo | currency}}</div>
+    </div>
+    <div class="info-parcela-acordo" style="background-color: #FFFFFF;border-radius: 8px;" *ngFor="let parcela of acordo.parcelas">
+        <div class="row info-parcela-acordo-header">
+            <div class="col text-nowrap text-left" style="min-width: 89px"><strong>Parcela {{parcela.numeroParcela}} de {{acordo.parcelas.length}}</strong></div>
+            <div class="col text-nowrap" style="min-width: 130px;"><strong>Valor:</strong>&nbsp;&nbsp;{{parcela.valorParcela | currency}}</div>
+            <div class="col text-nowrap"><strong>Vencimento:</strong>&nbsp;&nbsp; {{parcela.vencimento | date:'dd/MM/yyyy'}}</div>
+            <div class="col text-nowrap text-right"><button class="btn btn-link btn-sm text-nowrap" id="botaoDetalheAcordo{{acordo.consorcioAcordoID}}Parcela{{parcela.numeroParcela}}" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#detalheAcordo'+acordo.consorcioAcordoID+'Parcela'+parcela.numeroParcela" (click)="MudarTextoBotaoDetalheParcela('botaoDetalheAcordo'+acordo.consorcioAcordoID+'Parcela'+parcela.numeroParcela)">Menos detalhes</button></div>
+        </div>
+        <div class="detalhe-acordo accordion-collapse collapse card {{debitosabertos ? 'show' : ''}}" aria-expanded="true" id="detalheAcordo{{acordo.consorcioAcordoID}}Parcela{{parcela.numeroParcela}}">
+            <div style="margin-bottom: 10px">
+                <div *ngIf="parcela.arquivoBase64"><strong>Código:</strong> {{parcela.codigoDeBarra}}</div>
+                <div *ngIf="!parcela.arquivoBase64" class="boleto-em-geracao">O boleto será gerado e em breve estará em seu email</div>
+            </div>
+            <div class="buttons">
+                <button type="button" (click)="donwloadDocumento(parcela)" *ngIf="parcela.arquivoBase64" class="btn btn-primary">Boleto</button>
+                <button type="button" (click)="copyCodigoBarras(parcela.codigoDeBarra);" *ngIf="parcela.arquivoBase64" class="btn btn-primary">Copiar Código</button>
+            </div>
+            <div style="margin-top: 10px">
+                <a id="botao{{acordo.consorcioAcordoID}}Parcela{{parcela.numeroParcela}}" href="#" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#debitosAcordo'+acordo.consorcioAcordoID+'Parcela'+parcela.numeroParcela" (click)="MudarTextoDetalheDebitosAcordo('botao'+acordo.consorcioAcordoID+'Parcela'+parcela.numeroParcela)">Visualizar os débitos constantes nesta parcela</a>
+            </div>
+            <div class="accordion-collapse collapse card" id="debitosAcordo{{acordo.consorcioAcordoID}}Parcela{{parcela.numeroParcela}}">
+                <app-debitos-detalhes2 [lista]="parcela.debitos"></app-debitos-detalhes2>
+            </div>
+        </div>
+    </div>
+</div>

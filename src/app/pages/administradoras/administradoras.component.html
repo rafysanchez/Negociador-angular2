@@ -1,0 +1,66 @@
+<div *ngIf="loading" class="overlay">
+    <ngx-spinner><div class="mensagem-spinner" style="font-weight: bold; margin-top: 40px; padding: 3px; color: black; background-color: gray;">{{mensagemSpinner}}</div></ngx-spinner>
+</div>
+
+<div class="containerLogged pt-2" *ngIf="!loading">
+    <div class="text-center">
+        <div class="card">
+            <header>
+                <div class="card-body">
+                    <div *ngIf="erro != ''">{{erro}}</div>
+                    <div *ngIf="listaAdministradoras.length == 1">
+                        <p class="pb-2">Identificamos que você possui cadastro na administradora abaixo</p>
+                        <ul class="d-flex flex-column align-items-center">
+                            <li *ngFor="let administradora of listaAdministradoras" style="list-style-type: none; align-content:flex-start;">
+                                <b>{{administradora.nomeFantasia}}</b>
+                            </li>
+                        </ul>
+                        <p class="pt-1">O que você deseja fazer?</p>
+                        <div class="d-flex flex-row">
+                            <button type="button" class="btn btn-primary" (click)="verDebitos()">Débitos em Aberto</button>
+                            <button type="button" class="btn btn-primary">Realizar Acordo</button>
+                            <button type="button" class="btn btn-primary">Acordos Realizados</button>
+                        </div>
+                        <div>
+                            <b>Atualizado em <br>{{dataHoraAtual | date:"dd/MM/yyyy HH:mm:ss"}}</b>
+                        </div>
+                    </div>
+
+                    <div *ngIf="listaAdministradoras.length > 1">
+                        <p>Identificamos que você possui cadastro em mais de uma administradora.<br>Selecione uma administradora e clique em <b>Avançar</b></p>
+
+                        <form>
+                            <div class="">
+                                <ul class="d-flex flex-column align-items-center">
+                                    <li *ngFor="let pessoa of listaAdministradoras" style="list-style-type: none; align-content:flex-start;">
+                                        <input type="radio" name="administradora" [value]="pessoa.pessoaID" (change)="administradoraAlterada(pessoa.pessoaID, pessoa.nomeFantasia)">&nbsp;<b>{{pessoa.nomeFantasia}}</b>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <p class="pt-5 pb-5" *ngIf="listaConsorcio != null && listaConsorcio.length == 0">
+                                <b>Não identificamos débitos em aberto para negociação neste momento. <br>{{dataHoraAtual | date:"dd/MM/yyyy HH:mm:ss"}}</b>
+                            </p>
+
+                            <p class="mt-3" style="text-align: right;" *ngIf="!administradoraJaEscolhida">
+                                <button type="button" class="btn btn-primary" (click)="avancar()">Avançar</button>
+                            </p>
+                            <div *ngIf="administradoraJaEscolhida">
+                                <hr/>
+                                <p>O que você deseja fazer na(s) cota(s) da administradora<br><b>{{nomeAdministradoraSelecionada}}</b>?</p>
+                                <div class="d-flex flex-row justify-content-center">
+                                    <button type="button" class="btn btn-primary" (click)="verDebitos()">Débitos em Aberto</button>
+                                    <button type="button" class="btn btn-primary" (click)="realizarNovoAcordo()">Realizar Acordo</button>
+                                    <button type="button" class="btn btn-primary" (click)="visualizarAcordos()">Acordos Realizados</button>
+                                </div>
+                                <div>
+                                    <b>Atualizado em <br>{{dataHoraAtual | date:"dd/MM/yyyy HH:mm:ss"}}</b>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </header>
+        </div>
+    </div>
+</div>

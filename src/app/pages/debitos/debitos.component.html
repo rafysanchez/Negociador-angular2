@@ -1,0 +1,37 @@
+<div *ngIf="loading" class="overlay">
+    <ngx-spinner><div class="mensagem-spinner" style="font-weight: bold; margin-top: 40px; padding: 3px; color: black; background-color: gray;">{{mensagemSpinner}}</div></ngx-spinner>
+</div>
+
+<div class="containerLogged pt-2">
+    <div class="text-center">
+        <div class="card">
+            <header>
+                <div class="card-body">
+                    <div *ngIf="erro != ''">{{erro}}</div>
+                    <div *ngIf="listaConsorcios.length == 0">Você não tem débitos pendentes no momento<br><b>{{dataHoraAtual | date:'dd/MM/yyyy HH:mm:ss'}}</b></div>
+                    <div *ngIf="listaConsorcios.length == 1">                        
+                        <p>Até o momento você possui os seguintes débitos em aberto na cota <b>{{listaConsorcios[0].grupoID}}/{{listaConsorcios[0].cota}}</b><br><b>{{dataHoraAtual | date:'dd/MM/yyyy HH:mm:ss'}}</b></p>
+                        <app-debitos-detalhes2 [lista]="listaConsorcios[0].debitosAtualizados"></app-debitos-detalhes2>
+                    </div>
+                    <div *ngIf="listaConsorcios.length > 0">
+                        <p>Identificamos que você possui mais de uma cota.<br>Clique no Grupo/Cota abaixo para visualizar os débitos</p>
+                        <my-tabs>
+                            <my-tab *ngFor="let acordo of listaConsorcios" [tabTitle]="acordo.grupoID + '/' + acordo.cota" (click)="cotaAlterada(acordo)">
+                                <p>Até o momento você possui os seguintes débitos em aberto na cota <b>{{acordo.grupoID}}/{{acordo.cota}}</b><br><b>{{dataHoraAtual | date:'dd/MM/yyyy HH:mm:ss'}}</b></p>
+                                <app-debitos-detalhes2 [lista]="acordo.debitosAtualizados"></app-debitos-detalhes2>
+                            </my-tab>
+                        </my-tabs>
+                    </div>    
+                    <div>
+                        <p class="pt-3 pb-0">O que você deseja fazer agora?</p>
+                        <div class="d-flex flex-row justify-content-center">
+                            <button type="button" class="btn btn-primary" (click)="alterarAdministradora()">Alterar a administradora</button>
+                            <button type="button" class="btn btn-primary" (click)="realizarNovoAcordo()">Realizar Acordo</button>
+                            <button type="button" class="btn btn-primary" (click)="visualizarAcordos()">Visualizar Acordos Já Realizados</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </div>
+    </div>
+</div>

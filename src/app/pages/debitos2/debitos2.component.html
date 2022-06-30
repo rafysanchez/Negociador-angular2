@@ -1,0 +1,50 @@
+<div *ngIf="loading" class="overlay">
+    <ngx-spinner><div class="mensagem-spinner" style="font-weight: bold; margin-top: 40px; padding: 3px; color: black; background-color: gray;">{{mensagemSpinner}}</div></ngx-spinner>
+</div>
+
+<div class="containerLogged pt-2" *ngIf="!loading">
+    <div *ngIf="!administradoraSelecionada" class="d-flex col justify-content-center row">
+        <p class="text-center">Selecione a administradora que deseja consultar.</p>
+        <button type="button" class="btn btn-primary" (click)="alterarAdministradora()">Administradoras</button>
+        <div class="pt-3 text-center">
+            <b>Atualizado em {{dataHoraAtual | date:"dd/MM/yyyy HH:mm:ss"}}</b>
+        </div>
+    </div>
+
+    <div class="text-center" *ngIf="administradoraSelecionada">
+        <div class="card">
+            <header>
+                <div class="card-body">
+                    <div *ngIf="erro != ''" class="erro pb-4">{{erro}}</div>
+                    <div *ngIf="listaConsorcios.length == 0">Você não tem débitos pendentes no momento<br><b>{{dataHoraAtual | date:'dd/MM/yyyy HH:mm:ss'}}</b></div>
+                    <div *ngIf="listaConsorcios.length > 0">
+                        <p *ngIf="listaConsorcios.length > 1">Identificamos que você possui mais de uma cota.<br>Escolha o Grupo e Cota abaixo para visualizar os débitos em aberto de cada uma</p>
+                        <my-tabs>
+                            <my-tab *ngFor="let acordo of listaConsorcios" [tabTitle]="(listaConsorcios.length == 1 ? 'Grupo/Cota: ' : '') + acordo.grupoID + '/' + acordo.cota">
+                                <div *ngIf="acordo.debitosAtualizados == 0">No momento você não tem débitos em aberto na cota <b>{{acordo.grupoID}}/{{acordo.cota}}</b><br><b>{{dataHoraAtual | date:'dd/MM/yyyy HH:mm:ss'}}</b></div>
+                                <p *ngIf="acordo.debitosAtualizados > 0">Até o momento você possui os seguintes débitos em aberto<br><b>{{dataHoraAtual | date:'dd/MM/yyyy HH:mm:ss'}}</b></p>
+                                <div *ngIf="acordo.bloqueadaNegociacaoOnline">
+                                    Cota com condição especial de negociação, entre em contato conosco por meio do
+                                    <span *ngFor="let contato of listaContatos" class="fw-normal flex-nowrap">
+                                        <span *ngIf="contato.tipo!='WhatsApp'" class="fw-normal flex-nowrap"><b>{{contato.valor}}</b>, </span>
+                                        <span *ngIf="contato.tipo=='WhatsApp'" class="fw-normal flex-nowrap">ou se preferir clique nesse <a href='https://api.whatsapp.com/send?phone={{contato.valor}}&text=Ol%C3%A1!%20Quero%20informa%C3%A7%C3%B5es%20sobre%20meu%20Cons%C3%B3rcio.' target="_blank">link</a> e fale por meio do WhatsApp</span>
+                                    </span>
+                                </div>
+                                <div><b>Atualizado em {{dataHoraAtual | date:'dd/MM/yyyy HH:mm:ss'}}</b></div>
+                                
+                                <app-debitos-detalhes2 *ngIf="!acordo.bloqueadaNegociacaoOnline && acordo.debitosAtualizados && acordo.debitosAtualizados.length > 0" [lista]="acordo.debitosAtualizados"></app-debitos-detalhes2></my-tab>
+                        </my-tabs>
+                    </div>    
+                    <div>
+                        <p class="pt-3 pb-0">O que você deseja fazer agora?</p>
+                        <div class="d-flex flex-row justify-content-center">
+                            <button type="button" *ngIf="qtdeAdministradoras>1" class="btn btn-primary" (click)="alterarAdministradora()">Administradora/Banco</button>
+                            <button type="button" class="btn btn-primary" (click)="realizarNovoAcordo()">Realizar Acordo</button>
+                            <button type="button" class="btn btn-primary" (click)="visualizarAcordos()">Ver Acordos Realizados</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,42 @@
+<div *ngIf="loading" class="overlay">
+    <ngx-spinner><div class="mensagem-spinner" style="font-weight: bold; margin-top: 40px; padding: 3px; color: black; background-color: gray;">{{mensagemSpinner}}</div></ngx-spinner>
+</div>
+
+<div class="containerLogged pt-2" *ngIf="!loading">
+    <div *ngIf="!administradoraSelecionada" class="d-flex col justify-content-center row">
+        <p class="text-center">Selecione a administradora que deseja consultar.</p>
+        <button type="button" class="btn btn-primary" (click)="alterarAdministradora()">Administradoras</button>
+    </div>
+
+    <div class="text-center" *ngIf="administradoraSelecionada">
+        <div class="card">
+            <header>
+                <div class="card-body">
+                    <div *ngIf="erro != ''" class="erro pb-4">{{erro}}</div>
+                    <div class="pb-2" *ngIf="listaConsorcios.length == 0">Você não tem acordos ativos no momento<br></div> 
+                    <div *ngIf="listaConsorcios.length > 0">
+                        <p *ngIf="listaConsorcios.length > 1">Identificamos que você possui mais de uma cota.<br>Escolha o Grupo e Cota abaixo para visualizar os acordos realizados em cada uma</p>
+                        <my-tabs>
+                            <my-tab *ngFor="let cota of listaConsorcios" [tabTitle]="(listaConsorcios.length == 1 ? 'Grupo/Cota: ' : '') + cota.grupoID + '/' + cota.cota">      
+                                <div class="pb-2" *ngIf="cota.acordos == undefined || cota.acordos == null || cota.acordos.length==0">No momento você não possui acordos em andamento conosco na cota <b>{{cota.grupoID}}/{{cota.cota}}</b></div> 
+                                <div class="pb-1"><b>Atualizado em {{dataHoraAtual | date:"dd/MM/yyyy HH:mm:ss"}}</b></div>
+                                
+                                <div class="billet-available" *ngFor="let acordo of cota.acordos; let posicao = index">
+                                    <app-acordo-detalhes [acordo]="acordo"></app-acordo-detalhes>
+                                </div>
+                            </my-tab>
+                        </my-tabs>
+                    </div>    
+                    <div>
+                        <p class="pt-3 pb-0">O que você deseja fazer agora?</p>
+                        <div class="d-flex flex-row justify-content-center">
+                            <button type="button" *ngIf="qtdeAdministradoras>1" class="btn btn-primary" (click)="alterarAdministradora()">Administradora/Banco</button>
+                            <button type="button" class="btn btn-primary" (click)="visualizarDebitos()">Ver Débitos em Aberto</button>
+                            <button type="button" class="btn btn-primary" (click)="realizarNovoAcordo()">Realizar Acordo</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </div>
+    </div>
+</div>

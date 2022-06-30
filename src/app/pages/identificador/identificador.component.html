@@ -1,0 +1,71 @@
+<div *ngIf="loading" class="overlay">
+    <ngx-spinner><div class="mensagem-spinner">{{mensagemSpinner}}</div></ngx-spinner>
+  </div>
+  
+<div *ngIf="solicitarCPF">
+    <span>Por favor informe seu CPF/CNPJ para acessar suas informações</span>
+    <form [formGroup]="userForm">
+        <input type="text" mask="000.000.000-00||00.000.000/0000-00" class="form-control" id="cpfcnpj" formControlName="cpfcnpj" required />
+        <div class="d-flex justify-content-end"><button type="button" class="btn btn-primary" (click)="buscarCliente()">Avançar</button></div>
+    </form>
+    <div *ngIf="erro" style="margin-top: 20px;">
+        <span style="color: red;" [innerHTML]="erro"></span>
+    </div>
+</div>
+  
+<div *ngIf="solicitarContato">
+    <header>
+        <h3 class="title">{{nomeCliente}}</h3>
+        <p *ngIf="listaComunicacao == null || listaComunicacao.length == 0" class="pt-3 text-danger" [innerHTML]="'Entre em contato conosco por meio do telefone ' + obterTelefone() + ' para atualizar o seu cadastro.'"></p>
+        <p *ngIf="listaComunicacao != null && listaComunicacao.length > 0">
+            Localizamos o seu cadastro.<br>
+            Escolha uma das opções abaixo para receber a sua chave de acesso
+        </p>
+    </header>
+    <form *ngIf="listaComunicacao != null && listaComunicacao.length > 0">
+        <ul>
+            <li *ngFor="let comunicacao of listaComunicacao" class="pb-2">
+                <input type="radio" name="change-input" (click)="escolheContato(comunicacao)" value="{{comunicacao.contatoID}}"> <b>{{obterTipoContatoParaOpcoes(comunicacao.tblMeioComunicacao)}}:</b> {{comunicacao.valor}}
+            </li>
+        </ul>
+        <div style="width: 100%;">
+            <table border="0" width="100%">
+                <tr>
+                    <td align="left"><a href="#" (click)="naoReconheceDados()">Não reconhece os dados apresentados?</a></td>
+                    <td align="right"><button type="button" class="btn btn-primary" (click)="gerarChaveAcesso()">Avançar</button></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><br>
+                        <div *ngIf="erro" style="margin-top: 20px;">
+                            <span style="color: red;" [innerHTML]="erro"></span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="validaChaveAcesso">
+    <header>
+        <h3 class="title">{{nomecliente}}</h3>
+        <p>Informe aqui a chave de acesso que foi enviada por {{obterTipoContato()}}</p>
+    </header>
+
+    <form [formGroup]="chaveForm">
+
+        <input type="text" formControlName="chave" required class="form-control" id="chaveacesso">
+
+        <div *ngIf="erroValidarChave">
+            <span style="color: red; text-transform: initial;"><b>Chave de Acesso Inválida</b></span>
+        </div>
+
+        <div class="row" style="justify-content: space-between; display: flex; align-items: center;width:100%">
+            <div class="col text-left"><button type="button" class="btn btn-primary" style="background-color: #ff7200;" (click)="voltarOpcoesToken()">Voltar</button></div>
+            <div class="col text-right"><button type="button" class="btn btn-primary" (click)="validarChave()">Avançar</button></div>
+        </div>    
+        <div *ngIf="erro" style="margin-top: 20px;">
+            <span style="color: red;" [innerHTML]="erro"></span>
+        </div>                
+    </form>
+</div>

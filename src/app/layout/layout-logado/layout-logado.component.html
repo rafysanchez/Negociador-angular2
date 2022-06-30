@@ -1,0 +1,38 @@
+<section>
+    <article class="content-form without-box-shadow">
+        <div class="container containerLogged">
+            <header class="header-main">
+                <div class="container containerLogged">
+                    <table border="0" width="100%">
+                        <tr>
+                            <td><img src="assets/img/logo-funchal.png" alt="Funchal Cobranças"></td>
+                            <td align="center" width="30px">
+                                <a href="#" (click)="logoff()">
+                                    <div>
+                                        <img src="assets/img/logout.png" class="logoff" alt="Sair">
+                                    </div>
+                                    <div class="texto-logoff fw-bold" style="font-size: 18px;">Sair</div>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </header>
+            
+            <div class="content-logged">
+                <navbar-cmp></navbar-cmp>        
+                <div class="header-step-4-content row pt-2" style="display: grid; grid-template-columns: 2fr 1fr;">
+                    <h3 class="title col-auto" style="min-width: 350px">{{nomeCliente}}</h3>
+                    <div *ngIf="grupo != null && grupo != '' && cota != null && cota != ''">
+                        <h3 class="title col-auto" style="min-width: 350px"><span style="color: black">Grupo/Cota:</span> {{grupo}}/{{cota}}</h3>
+                    </div>
+                </div>  
+                <div class="row" *ngIf="nomeAdministradora != null && nomeAdministradora != ''" style="height: 25px;">
+                    <h3 class="title-adm col-auto" style="min-width: 350px"><b>Administradora:</b> {{nomeAdministradora}}</h3>
+                </div>
+        
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </article>
+  </section>

@@ -1,0 +1,30 @@
+<div class="auth__body__products-list auth__body__products-list--fallback">
+    <form>
+        <div>
+            <span style="font-size:x-large;font-style: oblique;color: #FF7200;" >{{nomecliente}}</span>
+            <p></p>
+            <span style="font-size: medium;">
+                Para continuar escolha uma das opções abaixo para receber a sua chave de acesso
+            </span>
+        </div>
+         <br>
+         <br>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+            <label class="form-check-label" for="exampleRadios1">
+             {{email}}
+            </label>
+        </div>
+        <br><br>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+            <label class="form-check-label" for="exampleRadios2">
+            {{celular}}
+            </label>
+        </div>
+        <br>
+        <button type="submit" (click)="EnviarChaveAcesso()" class="btn btn-primary btn-lg btn-block btn-funchal">Avançar</button>
+        
+    </form>
+   
+</div>

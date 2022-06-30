@@ -1,0 +1,428 @@
+<ngx-spinner></ngx-spinner>
+<section>
+    <div class="" *ngIf="hide"></div>
+    <article [ngClass]="hide === true ? 'content-form' : 'content-form without-box-shadow '">
+        <div [ngClass]="hide === true ? 'content': 'container'">
+            <header class="header-main">
+                <div class="container">
+                    <img src="assets/img/logo-funchal.png" alt="Funchal Cobranças">
+
+                </div>
+
+            </header>
+            <div class="one-step" *ngIf="showStep1">
+                <span>Por favor informe seu CPF/CNPJ</span>
+                <form [formGroup]="userForm">
+                    <input type="text" mask="000.000.000-00||00.000.000/0000-00" class="form-control" id="cpfcnpj" formControlName="cpfcnpj" required />
+                    <button type="button" class="btn btn-primary" (click)="step1()">Avançar</button>
+                </form>
+                <div *ngIf="erro" style="margin-top: 20px;">
+                    <span style="color: red;" [innerHTML]="erro"></span>
+                </div>
+            </div>
+            <div class="second-step" *ngIf="showStep2">
+                <header>
+                    <h3 class="title">{{nomecliente}}</h3>
+                    <p *ngIf="listaComunicacao == null || listaComunicacao.length == 0" class="pt-3">Não possuímos seu telefone e email em nosso cadastro, entre em contato conosco no telefone (11) 3508-3000 para atualizar o seu cadastro.</p>
+                    <p *ngIf="listaComunicacao != null && listaComunicacao.length > 0">Para continuar escolha uma das opções abaixo para receber a sua chave de acesso</p>
+                </header>
+                <form *ngIf="listaComunicacao != null && listaComunicacao.length > 0">
+                    <ul>
+                        <li *ngFor="let comunicacao of listaComunicacao"><input type="radio" name="change-input" (click)="escolheContato(comunicacao.contatoID, comunicacao.tblMeioComunicacao)" value="{{comunicacao.contatoID}}" /> {{comunicacao.valor}}</li>
+                    </ul>
+                    <div style="width: 100%;">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td align="left"><a href="#" (click)="naoReconheceDados()">Não reconhece os dados apresentados?</a></td>
+                                <td align="right"><button type="button" class="btn btn-primary" (click)="step2()">Avançar</button></td>
+                            </tr>
+                            <tr>
+                                <td *ngIf="showMensagemNaoReconhece" colspan="2"><br>
+                                    <div [innerHTML]="mensagemNaoReconheceContato"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="third-step" *ngIf="showStep3">
+                <header>
+                    <h3 class="title">{{nomecliente}}</h3>
+                    <p>Para continuar informe a chave de acesso que foi enviada por {{tipoContatoEscolhido}}</p>
+                </header>
+
+                <form [formGroup]="chaveForm">
+
+                    <input type="text" formControlName="chave" required class="form-control" id="chaveacesso">
+
+                    <div *ngIf="erroValidarChave">
+                        <span style="color: red; text-transform: initial;"><b>Chave de Acesso Inválida</b></span>
+                    </div>
+
+                    <div class="row" style="justify-content: space-between; display: flex; align-items: center;width:100%">
+                        <div class="col text-left"><button type="button" class="btn btn-primary" style="background-color: #ff7200;" (click)="voltarOpcoesToken()">Voltar</button></div>
+                        <div class="col text-right"><button type="button" class="btn btn-primary" (click)="step3()">Avançar</button></div>
+                    </div>                    
+                </form>
+            </div>
+            <div class="four-step" *ngIf="showStep4">
+                <div class="flex-row d-flex w-100">
+                    <div class="flex-column w-100 align-items-stretch">
+                        <div class="container" style="padding-left:0px!important">
+                            <h3 style="font-size: 1.2rem"><strong>Administradora:</strong> {{listaPropostaAcordo.consorcio.nomeFantasia}}</h3>
+                            <a href="#">Alterar a Administradora</a>
+                        </div>
+                        <div class="container header-step-4-container" style="padding-left:0px!important">
+                            <div class="header-step-4-content row">
+                                <h3 class="title col-auto" style="min-width: 350px">{{nomecliente}}</h3>
+                                <h3 class="col" style="text-align: start; font-size: 1.2rem;"><strong>Grupo/Cota:</strong> <span style="color: #ff7200; font-weight: 600;"> {{listaPropostaAcordo.consorcio.grupoID}}&nbsp;|&nbsp;{{listaPropostaAcordo.consorcio.cota}}</span></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right col">
+                        <div><a href="#" target="_self" class="btn btn-link" onclick="window.location.reload(true);"> Sair</a></div>
+                        <div><button (click)="backStep2()" *ngIf="showBotaoVoltar" class="btn btn-primary" style="width:70px; height: 30px; padding:0px; background-color: #ff7200">Voltar</button></div>
+                        <div><button (click)="backStep7()" *ngIf="!showBotaoVoltar && listaPessoas.length > 1" class="btn btn-primary" style="width:70px; height: 30px; padding:0px; background-color: #ff7200">Voltar</button></div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="button" id="botaoMostraTodosDebitos" class="btn btn-primary btn-sm" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#todosDebitos'" (click)="MudarTextoBotaoTodosDebitos()">Visualizar todos os débitos em aberto hoje</button>
+                    <div id="todosDebitos" class="collapse">
+                        <table align="center" class="table table-striped" style="border: 1px solid #bbb; margin-bottom: 15px;">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle">Tipo de Débito</th>
+                                    <th class="text-center align-middle">Nº Débito</th>
+                                    <th class="text-center align-middle">Data de Vencimento</th>
+                                    <th class="text-center">Valor <br>Atualizado Até {{listaPropostaAcordo.debitosAtualizados[0].atualizadoAte | date:'dd/MM/yyyy'}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let d of listaPropostaAcordo.debitosAtualizados;">
+                                    <td class="text-center">{{d.tipo}}</td>
+                                    <td class="text-center">{{d.numeroDoDebito}}</td>
+                                    <td class="text-center">{{d.vencimento | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-center">{{d.valor | currency}}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <td><strong>Total da Dívida </strong></td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td class="text-center">
+                                    <strong>{{valorTotal | currency}}</strong>
+                                </td>
+                            </tfoot>
+
+                        </table>
+
+                        <div class="detalhamento-planilha">
+                            <p><span style="color: red; font-size: 15px;">*</span>Os débitos acima já compreendem todos os encargos.</p>
+                            <p class="item-detalhamento"><strong>PCL</strong> - Parcela do Consórcio atualizado</p>
+                            <p *ngIf="possuiDPJ" class="item-detalhamento"> <strong>DPJ</strong> - Despesas Jurídica</p>
+                            <p *ngIf="possuiDPC" class="item-detalhamento"> <strong>DPC</strong> - Despesas de Cobrança</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style=" font-weight: 500; font-size: 16px; ">
+                    Hoje temos as seguintes propostas de acordo para negociação, defina a proposta que melhor lhe atende e clique em 
+                    <span *ngIf="listaPropostaAcordo.propostasAcordo.length>1"><strong>Escolher proposta</strong></span>
+                    <span *ngIf="listaPropostaAcordo.propostasAcordo.length==1"><strong>Escolher proposta</strong></span>
+                </h3>
+                <!-- 1 Parcela -->
+
+                <div id="accordion">
+                    <div class="card " *ngFor="let proposta of listaPropostaAcordo.propostasAcordo">
+                        <div class="info" id="acordo{{proposta.numeroDaOpcao}}">
+
+                            <div class="row" style="margin-bottom:5px;justify-content: space-between; display: flex; align-items: center;">
+                                <span class="col" *ngIf="proposta.pagamentoVista"> À vista na data de hoje</span>
+                                <span class="col" *ngIf="!proposta.pagamentoVista && proposta.quantidadeParcela == 1"> 1 Parcela para o dia {{proposta.parcelas[0].vencimento | date:'dd/MM/yyyy'}}</span>
+                                <span class="col" *ngIf="!proposta.pagamentoVista && proposta.quantidadeParcela > 1"> {{proposta.quantidadeParcela}} Parcelas, com a 1ª para o dia {{proposta.parcelas[0].vencimento | date:'dd/MM/yyyy'}}</span>
+                                <span class="col-md-auto">Valor Total: {{proposta.valorAcordo | currency}}</span>
+                                <div class="col text-right">
+                                    <span><button class="btn btn-primary btn-sm " *ngIf="listaPropostaAcordo.propostasAcordo.length>1" (click)="step4(listaPropostaAcordo.consorcio, proposta)">Escolher proposta</button></span>
+                                    <span> <button class="btn btn-success btn-sm" *ngIf="listaPropostaAcordo.propostasAcordo.length==1" (click)="step4(listaPropostaAcordo.consorcio, proposta)">Aceitar negociação</button></span>
+                                    <span><button type="button" class="btn btn-link btn-sm" style="min-width: 85px" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#propostasAcordo'+proposta.numeroDaOpcao" (click)="MudarTextoBotaoDetalheAcordo('botaoDetalheAcordo'+proposta.numeroDaOpcao)" id="botaoDetalheAcordo{{proposta.numeroDaOpcao}}">Ver mais</button></span>
+                                </div>
+                            </div>
+
+                            <div class="accordion-collapse collapse card" style id="propostasAcordo{{proposta.numeroDaOpcao}}">
+                                <div *ngFor="let parcela of proposta.parcelas">
+                                    <div>
+                                        <div class="info-parcela">
+                                            <header>
+                                                <div class="row d-flex flex-row option-acordo-1 " style="align-items: center; justify-content: space-between; ">
+                                                    <span class="col">Parcela: {{parcela.numeroParcela}}</span>
+                                                    <span class="col">Vencimento: {{parcela.vencimento | date:'dd/MM/yyyy'}}</span>
+                                                    <span class="col">Valor: {{parcela.valorParcela | currency}}</span>
+                                                    <span class="col text-center"><button type="button " class="btn btn-link btn-sm" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#acordo'+proposta.numeroDaOpcao+'parcela'+parcela.numeroParcela" (click)="MudarTextoBotaoDetalheParcela('botaoDetalheParcela'+proposta.numeroDaOpcao+parcela.numeroParcela)" id="botaoDetalheParcela{{proposta.numeroDaOpcao}}{{parcela.numeroParcela}}">Mais detalhes</button></span>
+                                                </div>
+                                            </header>
+                                        </div>
+                                    </div>
+                                    <div id="acordo{{proposta.numeroDaOpcao}}parcela{{parcela.numeroParcela}}" class="collapse accordion-collapse">
+                                        <div class="card">
+                                            <div class="card-header" style="margin-top: 10px;">
+                                                <div>Débitos constantes nesta parcela</div>
+                                            </div>
+                                            <div class="card-body">
+                                                <table align="center" class="table table-striped" style="border: 1px solid #bbb; margin-bottom: 15px;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center align-middle">Tipo de Débito</th>
+                                                            <th class="text-center align-middle">Nº Débito</th>
+                                                            <th class="text-center align-middle">Data de Vencimento</th>
+                                                            <th class="text-center">Valor <br>Atualizado Até {{parcela.vencimento | date:'dd/MM/yyyy'}}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let debito of parcela.debitos">
+                                                            <td class="text-center">{{debito.tipo}}</td>
+                                                            <td class="text-center">{{debito.numeroDoDebito}}</td>
+                                                            <td class="text-center">{{debito.vencimento | date:'dd/MM/yyyy'}}</td>
+                                                            <td class="text-center">{{debito.valor | currency}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <td><strong>Total da Dívida </strong></td>
+                                                        <td>&nbsp;</td>
+                                                        <td>&nbsp;</td>
+                                                        <td class="text-right">
+                                                            <strong>{{parcela.valorParcela | currency}}</strong>
+                                                        </td>
+                                                    </tfoot>
+                                                </table>
+
+                                                <div class="detalhamento-planilha">
+                                                    <p><span style="color: red; font-size: 15px;">*</span>Os débitos acima já compreendem todos os encargos.</p>
+                                                    <p class="item-detalhamento"><strong>PCL</strong> - Parcela do Consórcio atualizado</p>
+                                                    <p *ngIf="possuiDPJ" class="item-detalhamento"> <strong>DPJ</strong> - Despesas Jurídica</p>
+                                                    <p *ngIf="possuiDPC" class="item-detalhamento"> <strong>DPC</strong> - Despesas de Cobrança</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- <table class="table table-striped">
+                <tr *ngFor="let parcela of acordo.parcelas">
+                  <td>{{parcela.numeroParcela}}</td>
+                  <td>{{parcela.valorParcela | currency:'BRL':true}}</td>
+                  <td>{{parcela.vencimento | date:'dd/MM/yyyy'}}</td>
+                </tr>
+                <tr *ngFor="let parcela of parcelas.parcelasEnvolvidas">
+                  <td>{{parcela.numeroParcela}}</td>
+                  <td>{{parcela.valorParcela | currency:'BRL':true}}</td>
+                  <td>{{parcela.vencimento | date:'dd/MM/yyyy'}}</td>
+                </tr>
+              </table> -->
+
+
+
+            </div>
+
+
+            <div class="five-step" *ngIf="showStep5">
+                <div class="row">
+                    <div class="col">
+                        <div class="container">
+                            <h3 style="font-size: 1.2rem;"><strong>Administradora:</strong> {{listaParcelas.consorcio.nomeFantasia}}</h3>
+                        </div>
+                        <div class="container header-step-4-container col" style="padding-left:0px!important">
+                            <div class="header-step-4-content col-auto w-100f flex-nowrap">
+                                <h3 class="title col-auto">{{nomecliente}}</h3>                                
+                                <h3 class="col-auto" style="text-align: end; font-size: 1.2rem;"><strong>Grupo/Cota:</strong> <span style="color: #ff7200; font-weight: 600;"> {{listaParcelas.consorcio.grupoID}}&nbsp;|&nbsp;{{listaParcelas.consorcio.cota}}</span></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right col">
+                        <div><a href="#" target="_self" class="btn btn-link" onclick="window.location.reload(true);"> Sair</a></div>
+                        <div><button (click)="backStep2()" *ngIf="showBotaoVoltar" class="btn btn-primary" style="width:70px; height: 30px; padding:0px; background-color: #ff7200">Voltar</button></div>
+                    </div>
+                </div>
+                <p style="padding-left: 15px;">Parcelas disponíveis para pagamento</p>
+                <div class="col-sm-12">
+                    <div class="billet-available" *ngFor="let acordo of listaParcelas.acordos">
+                        <div class="row" style="display: flex; padding: 5px 0px 10px 0px">
+                            <div class="col"><strong>Grupo/Cota:</strong> <span style="color: #ff7200; font-weight: 600; font-size: 1rem"> {{listaParcelas.consorcio.grupoID}}&nbsp;|&nbsp;{{listaParcelas.consorcio.cota}}</span></div>
+                            <div class="col"><strong>Valor Total:</strong> {{acordo.valorAcordo | currency}}</div>
+                            <div class="col" *ngIf="acordo.valorPago > 0"><strong>Valor Pago:</strong> {{acordo.valorPago | currency}}</div>
+                        </div>
+                        <div class="info-parcela-acordo" style="background-color: #FFFFFF;border-radius: 8px;" *ngFor="let parcela of acordo.parcelas">
+                            <div class="row info-parcela-acordo-header">
+                                <div class="col"><strong>Parcela {{parcela.numeroParcela}} de {{parcela.numeroDeParcela}}</strong></div>
+                                <div class="col"><strong>Valor:</strong>&nbsp;&nbsp;{{parcela.valorParcela | currency}}</div>
+                                <div class="col"><strong>Vencimento:</strong>&nbsp;&nbsp; {{parcela.vencimento | date:'dd/MM/yyyy'}}</div>
+                                <div class="col text-right"><button class="btn btn-link btn-sm" id="botaoDetalheAcordo{{acordo.consorcioAcordoID}}Parcela{{parcela.numeroParcela}}" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#detalheAcordo'+acordo.consorcioAcordoID+'Parcela'+parcela.numeroParcela" (click)="MudarTextoBotaoDetalheParcela('botaoDetalheAcordo'+acordo.consorcioAcordoID+'Parcela'+parcela.numeroParcela)">Mais detalhes</button></div>
+                            </div>
+                            <div class="detalhe-acordo accordion-collapse collapse card" id="detalheAcordo{{acordo.consorcioAcordoID}}Parcela{{parcela.numeroParcela}}">
+                                <div style="margin-bottom: 10px">
+                                    <div *ngIf="parcela.arquivoBase64"><strong>Código:</strong> {{parcela.codigoDeBarra}}</div>
+                                    <div *ngIf="!parcela.arquivoBase64" class="boleto-em-geracao">O boleto está sendo gerado e será enviado por email</div>
+                                </div>
+                                <div class="buttons">
+                                    <button type="button" (click)="donwloadDocumento(parcela)" *ngIf="parcela.arquivoBase64" class="btn btn-primary">Baixar Boleto</button>
+                                    <button type="button" (click)="copyCodigoBarras(parcela.codigoDeBarra);" *ngIf="parcela.arquivoBase64" class="btn btn-primary">Copiar Código</button>
+                                </div>
+                                <div style="margin-top: 10px">
+                                    <a id="botao{{acordo.consorcioAcordoID}}Parcela{{parcela.numeroParcela}}" href="#" [attr.data-bs-toggle]="'collapse'" [attr.data-bs-target]="'#debitosAcordo'+acordo.consorcioAcordoID+'Parcela'+parcela.numeroParcela" (click)="MudarTextoDetalheDebitosAcordo('botao'+acordo.consorcioAcordoID+'Parcela'+parcela.numeroParcela)">Visualizar os débitos constantes nesta parcela</a>
+                                </div>
+                                <div class="accordion-collapse collapse card" id="debitosAcordo{{acordo.consorcioAcordoID}}Parcela{{parcela.numeroParcela}}">
+                                    <table align="center" class="table table-striped" style="border: 1px solid #bbb; margin-bottom: 15px;">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center align-middle">Tipo de Débito</th>
+                                                <th class="text-center align-middle">Nº Débito</th>
+                                                <th class="text-center align-middle">Data de Vencimento</th>
+                                                <th class="text-center">Valor <br>Atualizado Até {{parcela.vencimento | date:'dd/MM/yyyy'}}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let debito of parcela.debitos">
+                                                <td class="text-center">{{debito.tipo}}</td>
+                                                <td class="text-center">{{debito.numeroDoDebito}}</td>
+                                                <td class="text-center">{{debito.vencimento | date:'dd/MM/yyyy'}}</td>
+                                                <td class="text-center">{{debito.valor | currency}}</td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <td colspan="3"><strong>Total da Dívida </strong></td>
+                                            <td class="text-center">
+                                                <strong>{{parcela.valorParcela | currency}}</strong>
+                                            </td>
+                                        </tfoot>
+                                    </table>
+
+                                    <div class="detalhamento-planilha">
+                                        <p><span style="color: red; font-size: 15px;">*</span>Os débitos acima já compreendem todos os encargos.</p>
+                                        <p class="item-detalhamento"><strong>PCL</strong> - Parcela do Consórcio atualizado</p>
+                                        <p *ngIf="parcela.possuiDPJ" class="item-detalhamento"> <strong>DPJ</strong> - Despesas Jurídica</p>
+                                        <p *ngIf="parcela.possuiDPC" class="item-detalhamento"> <strong>DPC</strong> - Despesas de Cobrança</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="line">
+            <div class="info" style="grid-template-columns: none !important;">
+              <div class="plots">
+                <header>
+                  <h2 class="title">Parcelas</h2>
+                </header>
+              </div>
+              <table class="table">
+                <tr *ngFor="let parcela of listaParcelas">
+                  <td>{{parcela.grupoID}}</td>
+                  <td>{{parcela.numeroDaParcela}}</td>
+                  <td>{{parcela.valorDaParcela | currency:'BRL':true}}</td>
+                  <td>{{parcela.dataDeVencimento | date:'dd/MM/yyyy'}}</td>
+                  <td></td>
+                </tr>
+
+              </table>
+            </div>
+          </div> -->
+            </div>
+
+            <div class="six-step" *ngIf="showStep6">
+                <table border="0" width="1005">
+                    <tr>
+                        <td>
+                            <div class="row">
+                                <h3 class="col" style="font-size: 1.2rem"><strong>Administradora:</strong> {{listaConsorcio[0].nomeFantasia}}</h3>
+                                <a class="col" href="#">Alterar a Administradora</a>
+                            </div>
+                        </td>
+                        <td align="right"><a href="#" target="_self" class="btn btn-link" onclick="window.location.reload(true);"> Sair</a></td>
+                    </tr>
+                </table>
+
+                <div class="card">
+                    <header>
+                        <div class="card-header">
+                            <h3 class="title">{{nomecliente}}</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Muito obrigado pelas confirmações. </p>
+
+                            <div *ngIf="showLinkAcordo">
+                                <button class="btn btn-primary btn-view" (click)="getParcela(acordo)">Visualizar acordos em negociação</button>
+                            </div>
+
+                            <p *ngIf="qtdeCotasSemAcordo>1">Identificamos que você possui mais de uma cota.</p>
+                            <p *ngIf="qtdeCotasSemAcordo==1">Por favor escolha a cota abaixo para acessar os valores e propostas de negociação.</p>
+                            <p *ngIf="qtdeCotasSemAcordo>1">Por favor escolha uma das cotas abaixo para acessar os valores e propostas de negociação.</p>
+
+                            <!-- 1 Parcela -->
+                            <div *ngFor="let acordo of listaConsorcio">
+                                <div class="line card card-header" *ngIf="acordo.consorcioAcordoID === 0">
+                                    <table border="0" width="100%">
+                                        <tr>
+                                            <td width="33%"><strong>Grupo/cota:</strong> {{acordo.grupoID}}/{{acordo.cota}}</td>
+                                            <td width="33%" alig="center"><strong>Quantidade de Débitos: </strong>{{acordo.quantidadeDebito}}</td>
+                                            <td width="33%" align="right"><button class="btn btn-primary" style="width: 153px" *ngIf="acordo.permiteNegociacaoOnline && !acordo.bloqueadaNegociacaoOnline" (click)="getAcordo(acordo)">Escolher Contrato</button></td>
+                                        </tr>
+                                    </table>
+
+                                    <div class="pt-2" style="color: red" *ngIf="!acordo.permiteNegociacaoOnline || acordo.bloqueadaNegociacaoOnline" [innerHTML]="acordo.mensagem"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                </div>
+            </div>
+
+            <div class="seven-step" *ngIf="showStep7" style="position: absolute; top: 120px;">
+                <div class="flex-row d-flex w-100">
+                    <div class="flex-column w-100 align-items-stretch">
+                        <div class="container header-step-4-container" style="padding-left:0px!important">
+                            <div class="header-step-4-content row">
+                                <h3 class="title col-auto" style="min-width: 350px">{{nomecliente}}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right col">
+                        <div><a href="#" target="_self" class="btn btn-link" onclick="window.location.reload(true);"> Sair</a></div>
+                        <div><button (click)="backStep2()" *ngIf="showBotaoVoltar" class="btn btn-primary" style="width:70px; height: 30px; padding:0px; background-color: #ff7200">Voltar</button></div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <div class="card">
+                        <header>
+                            <div class="card-body">
+                                <p>Identificamos que você possui cadastro em mais de uma administradora, selecione a administradora que deseja visualizar e clique em <b>Avançar</b></p>
+    
+                                <form>
+                                    <ul class="d-flex flex-column align-items-center">
+                                        <li *ngFor="let pessoa of listaPessoas" style="list-style-type: none; align-content:flex-start;">
+                                            <input type="radio" groupName="administradora" [value]="pessoa.pessoaID" (change)="administradoraAlterada($event)">&nbsp;{{pessoa.nomeFantasia}}
+                                        </li>
+                                    </ul>
+
+                                    <p class="pt-5 pb-5" *ngIf="listaConsorcio != null && listaConsorcio.length == 0">
+                                        <b>Não identificamos débitos em aberto para negociação neste momento. <br>{{dataHoraAtual | date:"dd/MM/yyyy HH:mm:ss"}}</b>
+                                    </p>
+    
+                                    <p class="mt-3" style="text-align: right;">
+                                        <button type="button" class="btn btn-primary" (click)="obterConsorcios()">Avançar</button>
+                                    </p>
+                                </form>
+                            </div>
+                        </header>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>

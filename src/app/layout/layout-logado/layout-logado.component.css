@@ -1,0 +1,29 @@
+.mensagem-spinner
+{
+    font-weight: bold;
+    margin-top: 40px;
+    padding: 3px;
+    color: black;
+    background-color: gray;
+}
+
+.btn-primary {
+    background: #01006a;
+    max-width: 200px;
+    width: 100%;
+    color: #fff;
+    font-size: 1rem;
+    border: 1px solid #fff;
+    font-weight: 700;
+    transition: all .2s ease;
+    margin-top: 10px;
+}
+
+.nav-item a{
+    text-decoration: none;
+}
+
+.btn-primary-orange{
+    background-color: #ff7200;
+    border-color: #ff7200;
+}
